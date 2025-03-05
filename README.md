@@ -17,6 +17,7 @@ Interface for RNS using Meshtastic as the underlying networking layer to utilize
   mode = gateway
   port = /dev/[path to device]  # Optional: Meshtastic serial device port
   ble_port = short_1234  # Optional: Meshtastic BLE device ID (Replacement for serial port)
+  tcp_port = 127.0.0.1:4403  #Optional: Meshtastic TCP IP. [port is optional if using default port] (Replacement for serial or ble)
   data_speed = 8  # Radio speed setting desired for the network(do not use long-fast)
 ```
 

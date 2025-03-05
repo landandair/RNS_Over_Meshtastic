@@ -90,7 +90,9 @@ class MeshtasticInterface(Interface):
         # case any are missing.
         port = ifconf["port"] if "port" in ifconf else None
         ble_port = ifconf["ble_port"] if "ble_port" in ifconf else None
+        tcp_port = ifconf["tcp_port"] if "tcp_port" in ifconf else None
         speed = int(ifconf["data_speed"]) if "data_speed" in ifconf else 8
+        hop_limit = int(ifconf["hop_limit"]) if "hop_limit" in ifconf else 1
 
         # All interfaces must supply a hardware MTU value
         # to the RNS Transport instance. This value should
@@ -113,6 +115,7 @@ class MeshtasticInterface(Interface):
         self.owner = owner
         self.port = port
         self.ble_port = ble_port
+        self.tcp_port = tcp_port
         self.speed = speed
         self.timeout = 100
         self.interface = None
@@ -122,7 +125,7 @@ class MeshtasticInterface(Interface):
         self.expected_index = {}
         self.requested_index = {}
         self.packet_index = 0
-        self.hop_limit = 1
+        self.hop_limit = hop_limit
 
 
         pub.subscribe(self.process_message, "meshtastic.receive")
@@ -151,6 +154,15 @@ class MeshtasticInterface(Interface):
             RNS.log("Meshtastic: Opening ble device " + self.ble_port + "...", RNS.LOG_VERBOSE)
             from meshtastic.ble_interface import BLEInterface
             self.interface = BLEInterface(address=self.ble_port)
+        elif self.tcp_port:
+            RNS.log("Meshtastic: Opening tcp device " + self.tcp_port + "...", RNS.LOG_VERBOSE)
+            from meshtastic.tcp_interface import TCPInterface, DEFAULT_TCP_PORT
+            host = self.tcp_port
+            port = DEFAULT_TCP_PORT
+            if ":" in self.tcp_port:
+                host, port = self.tcp_port.split(":", maxsplit=1)
+            
+            self.interface = TCPInterface(hostname=host, portNumber=port)
         else:
             raise ValueError(f"No port or ble_port specified for {self}")
 
